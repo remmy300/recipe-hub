@@ -4,7 +4,6 @@ import { generateToken } from "../utils/generateToken";
 
 // Register user
 export const registerUser = async (req: Request, res: Response) => {
-  console.log("í dont think the issue is here");
   try {
     const { email, name, avatar, password } = req.body;
 
@@ -22,8 +21,6 @@ export const registerUser = async (req: Request, res: Response) => {
       avatar: user.avatar,
       token: generateToken(user._id.toString()),
     });
-    console.log("📩 Register route hit");
-    console.log("Request body:", req.body);
   } catch (error) {
     res.status(500).json({ message: "Server error" });
   }

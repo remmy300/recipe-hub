@@ -1,6 +1,6 @@
 import { Response, Request } from "express";
-import { Recipe } from "../models/Recipe.js";
-import { Comment } from "../models/Comment.js";
+import { Recipe } from "../models/Recipe";
+import { Comment } from "../models/Comment";
 
 // Extend Express Request interface to include 'user'
 declare global {

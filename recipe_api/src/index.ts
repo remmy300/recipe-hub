@@ -1,40 +1,28 @@
-import dotenv from "dotenv";
 import cors from "cors";
-import { connectDB } from "./config/server.js";
 import express, { Application } from "express";
 import recipeRoutes from "./routes/recipeRoutes";
-import commentRoutes from "./routes/commentRoutes.js";
-import authRoutes from "./routes/authRoutes.js";
+import commentRoutes from "./routes/commentRoutes";
+import authRoutes from "./routes/authRoutes";
+import rateLimiter from "./middleware/rateLimiter";
+import errorHandler from "./middleware/errorHandler";
 
-dotenv.config();
-
-const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 8080;
 const app: Application = express();
 
+// Middlewares
 app.use(cors());
-// middleware
-app.use(express.json()); //allows to parse JSON bodies: req.body
+app.use(express.json());
 
-app.get("/api/auth/test", (req, res) => {
-  res.json({ message: "Test route from index ✅" });
-});
-
-app.get("/", (req, res) => {
-  res.json({ message: "API is working 🚀" });
-});
-
-app.use((req, res, next) => {
-  console.log(`[${req.method}] ${req.originalUrl}`);
-  next();
-});
+// Only enable rate limiter outside tests
+if (process.env.NODE_ENV !== "test") {
+  app.use("/api", rateLimiter);
+}
 
 // Routes
 app.use("/api/recipe", recipeRoutes);
 app.use("/api/comments", commentRoutes);
 app.use("/api/auth", authRoutes);
 
-connectDB().then(() => {
-  app.listen(PORT, () => {
-    console.log(`server started on port ${PORT}`);
-  });
-});
+// Global error handler
+app.use(errorHandler);
+
+export default app;
