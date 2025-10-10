@@ -61,7 +61,15 @@ export const createRecipe = async (
   next: NextFunction
 ) => {
   try {
-    const newRecipe = new Recipe(req.body);
+    const { title, ingredients, description, instructions } = req.body;
+    const newRecipe = new Recipe({
+      title,
+      ingredients,
+      description,
+      instructions,
+      imageUrl: req.file?.path,
+      user: req.user._id,
+    });
     const saved = await newRecipe.save();
     res.status(201).json(saved);
   } catch (error) {

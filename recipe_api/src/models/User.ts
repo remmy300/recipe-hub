@@ -27,7 +27,7 @@ const userSchema = new Schema<IUser>(
   },
   { timestamps: true }
 );
-//Pre-save hook for hashing the password
+//Pre-save hook for hashing the password....runs beforea doc is saved in the DB
 userSchema.pre("save", async function (next) {
   if (!this.isModified("password")) return next(); //only hash if  new password has changed
   const salt = await bycrypt.genSalt(10); // generate random strings to be added to the created password
