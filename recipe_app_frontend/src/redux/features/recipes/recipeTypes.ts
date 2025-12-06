@@ -1,3 +1,5 @@
+import { StaticImport } from "next/dist/shared/lib/get-img-props";
+
 // Represents a single recipe
 export interface Recipe {
   _id: string;
@@ -7,7 +9,8 @@ export interface Recipe {
   description?: string;
   cookingTime?: number;
   servings?: number;
-  image?: string;
+  imageUrl?: string;
+  category?: string;
   createdBy?: string;
   createdAt?: string;
   updatedAt?: string;
@@ -21,7 +24,7 @@ export interface CreateRecipePayload {
   description?: string;
   cookingTime?: number;
   servings?: number;
-  image?: string;
+  imageUrl?: string;
 }
 
 //  Used when updating a recipe
@@ -32,7 +35,7 @@ export interface UpdateRecipePayload {
   description?: string;
   cookingTime?: number;
   servings?: number;
-  image?: string;
+  imageUrl?: string;
 }
 
 //  Used for API responses (e.g., from /api/recipes)

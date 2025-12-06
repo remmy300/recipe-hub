@@ -1,6 +1,7 @@
 import { configureStore } from "@reduxjs/toolkit";
 import { combineReducers } from "redux";
 import authReducer from "./features/auth/authSlice";
+import recipeReducer from "./features/recipes/recipeSlice";
 
 //function to load token from local storage
 
@@ -16,6 +17,7 @@ const loadState = () => {
 export const store = configureStore({
   reducer: combineReducers({
     auth: authReducer,
+    recipes: recipeReducer,
   }),
 
   preloadedState: typeof window !== "undefined" ? loadState() : undefined, //prehydrate on client

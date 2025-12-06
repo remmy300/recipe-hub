@@ -63,3 +63,27 @@ export const deleteRecipe = createAsyncThunk<
     return handleAxiosError(error, rejectWithValue) as never;
   }
 });
+
+export const toggleFavourite = createAsyncThunk<
+  Recipe,
+  string,
+  { rejectValue: string }
+>("recipe/favourite", async (id, { rejectWithValue }) => {
+  try {
+    return await recipeApi.favorite(id);
+  } catch (error) {
+    return handleAxiosError(error, rejectWithValue) as never;
+  }
+});
+
+export const toggleLike = createAsyncThunk<
+  Recipe,
+  string,
+  { rejectValue: string }
+>("recipe/like", async (id, { rejectWithValue }) => {
+  try {
+    return await recipeApi.like(id);
+  } catch (error) {
+    return handleAxiosError(error, rejectWithValue) as never;
+  }
+});

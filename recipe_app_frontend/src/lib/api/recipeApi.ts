@@ -2,39 +2,55 @@ import {
   Recipe,
   CreateRecipePayload,
 } from "@/redux/features/recipes/recipeTypes";
-import axios from "axios";
+import api from "./api";
 
 export const recipeApi = {
   getAll: async (): Promise<Recipe[]> => {
-    const res = await axios.get<Recipe[]>("/api/recipes");
+    const res = await api.get<Recipe[]>("/api/recipes");
     if (res.status < 200 || res.status >= 300)
       throw new Error("Failed to fetch recipe data");
     return res.data;
   },
 
   create: async (recipe: CreateRecipePayload): Promise<Recipe> => {
-    const res = await axios.post<Recipe>("/api/recipes", recipe);
+    const res = await api.post<Recipe>("/api/recipes", recipe, {
+      withCredentials: true,
+    });
+    console.log("Created recipe:", res);
+
     return res.data;
   },
 
   getOne: async (id: string): Promise<Recipe> => {
-    const res = await axios.get(`/api/recipes/${id}`);
+    const res = await api.get(`/api/recipes/${id}`);
     if (res.status < 200 || res.status >= 300)
       throw new Error("failed to get the recipe data by ID");
     return res.data;
   },
 
   update: async (id: string, recipe: Partial<Recipe>): Promise<Recipe> => {
-    const res = await axios.post(`/api/recipe/${id}`, recipe);
+    const res = await api.post(`/api/recipe/${id}`, recipe);
     if (res.status < 200 || res.status >= 300)
       throw new Error("failed to update the recipe");
     return res.data;
   },
 
   remove: async (id: string): Promise<{ success: boolean; id: string }> => {
-    const res = await axios.delete(`/api/recipe/${id}`);
+    const res = await api.delete(`api/recipe/${id}`);
     if (res.status < 200 || res.status >= 300)
       throw new Error("failed to delete the recipe");
+    return res.data;
+  },
+  favorite: async (id: string): Promise<Recipe> => {
+    const res = await api.post(`/api/recipes/${id}/favorite`, null, {
+      withCredentials: true,
+    });
+    return res.data;
+  },
+  like: async (id: string): Promise<Recipe> => {
+    const res = await api.post(`/api/recipes/${id}/like`, null, {
+      withCredentials: true,
+    });
     return res.data;
   },
 };

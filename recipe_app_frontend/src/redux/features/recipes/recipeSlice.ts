@@ -77,6 +77,9 @@ const recipeSlice = createSlice({
   },
 });
 
+export default recipeSlice.reducer;
+export const { clearSelectedRecipe } = recipeSlice.actions;
+
 //Key Takeaways
 
 //The API defines what your thunk returns.

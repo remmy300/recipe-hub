@@ -1,0 +1,115 @@
+"use client";
+
+import React, { FormEvent, useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { useRouter } from "next/navigation";
+import GoogleAuthBtn from "@/components/GoogleAuthBtn";
+import { useAppDispatch } from "@/redux/hooks";
+import { registerUser } from "@/redux/features/auth/authThunks";
+
+const Page = () => {
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  const router = useRouter();
+  const dispatch = useAppDispatch();
+
+  const handleSignup = async (e: FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setError("");
+
+    if (password.length < 6) {
+      setError("Password must be at least 6 characters");
+      return;
+    }
+
+    const result = await dispatch(registerUser({ name, email, password }));
+
+    if (registerUser.fulfilled.match(result)) {
+      router.push("/add-recipe");
+      console.log("REDIRECT SHOULD HAPPEN NOW");
+    } else {
+      setError(result.payload || "Registration failed");
+    }
+
+    setLoading(false);
+  };
+
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
+      <div className="w-full max-w-md bg-white shadow-lg rounded-xl p-6 space-y-6">
+        <h1 className="text-2xl font-semibold text-center">Create Account</h1>
+
+        {error && <p className="text-red-500 text-center text-sm">{error}</p>}
+
+        {/* REGISTER FORM */}
+        <form onSubmit={handleSignup} className="space-y-4">
+          <div className="space-y-1">
+            <label className="font-medium">Full Name</label>
+            <Input
+              type="text"
+              placeholder="John Doe"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+            />
+          </div>
+
+          <div className="space-y-1">
+            <label className="font-medium">Email</label>
+            <Input
+              type="email"
+              placeholder="johndoe@example.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+          </div>
+
+          <div className="space-y-1">
+            <label className="font-medium">Password</label>
+            <Input
+              type="password"
+              placeholder="••••••••"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+          </div>
+
+          <Button
+            type="submit"
+            className="w-full py-2 bg-orange-500 hover:bg-orange-600 text-white"
+            disabled={loading}
+          >
+            {loading ? "Creating account..." : "Sign Up"}
+          </Button>
+        </form>
+
+        {/* Divider */}
+        <div className="flex items-center gap-3">
+          <div className="flex-1 h-px bg-gray-300"></div>
+          <span className="text-gray-500 text-sm">OR</span>
+          <div className="flex-1 h-px bg-gray-300"></div>
+        </div>
+
+        {/* GOOGLE LOGIN */}
+        <GoogleAuthBtn />
+
+        <p className="text-center text-sm text-gray-600">
+          Already have an account?{" "}
+          <span
+            className="text-orange-500 cursor-pointer hover:underline"
+            onClick={() => router.push("/login")}
+          >
+            Login
+          </span>
+        </p>
+      </div>
+    </div>
+  );
+};
+
+export default Page;

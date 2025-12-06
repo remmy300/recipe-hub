@@ -1,4 +1,5 @@
 export interface User {
+  interceptors: any;
   name: string;
   email: string;
   password: string;

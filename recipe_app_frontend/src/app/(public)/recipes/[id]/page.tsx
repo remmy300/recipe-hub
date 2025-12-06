@@ -1,10 +1,10 @@
 import React from "react";
-import HomePage from "../components/features/HomePage";
+import RecipeDetails from "./Layout";
 
 const page = () => {
   return (
     <div>
-      <HomePage />
+      <RecipeDetails />
     </div>
   );
 };

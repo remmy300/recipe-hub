@@ -1,32 +1,33 @@
 "use client";
 
-import { QueryClientProvider } from "@tanstack/react-query";
+import React, { ReactNode, useState } from "react";
+import {
+  QueryClient,
+  QueryClientProvider,
+  HydrationBoundary,
+  DehydratedState,
+} from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
-import { QueryClient } from "@tanstack/react-query";
-import { HydrationBoundary, DehydratedState } from "@tanstack/react-query";
-import { useState } from "react";
-import React from "react";
 import { Provider } from "react-redux";
-import { store } from "../redux/store";
-import { ReactNode } from "react";
+import { store } from "@/redux/store";
 
-export const Providers = ({
+export const AppProviders = ({
   children,
-  DehydrateState,
+  dehydratedState,
 }: {
-  children: React.ReactNode;
-  DehydrateState?: DehydratedState;
+  children: ReactNode;
+  dehydratedState?: DehydratedState;
 }) => {
   const [queryClient] = useState(() => new QueryClient());
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <HydrationBoundary state={DehydrateState}>{children}</HydrationBoundary>
-      <ReactQueryDevtools initialIsOpen={false} />
-    </QueryClientProvider>
+    <Provider store={store}>
+      <QueryClientProvider client={queryClient}>
+        <HydrationBoundary state={dehydratedState}>
+          {children}
+        </HydrationBoundary>
+        <ReactQueryDevtools initialIsOpen={false} />
+      </QueryClientProvider>
+    </Provider>
   );
-};
-
-export const ReduxProvider = ({ children }: { children: ReactNode }) => {
-  return <Provider store={store}>{children}</Provider>;
 };
