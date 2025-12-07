@@ -12,7 +12,7 @@ const RecipeActions = ({ recipeId }: any) => {
     <div className="flex gap-8 mt-3">
       <Button
         className="text-sm text-white bg-orange-500 hover:bg-orange-600"
-        onClick={() => router.push(`/api/recipes/${recipeId}`)}
+        onClick={() => router.push(`/add-recipe?edit=${recipeId}`)}
       >
         Edit
       </Button>
@@ -20,13 +20,17 @@ const RecipeActions = ({ recipeId }: any) => {
         className="text-sm text-white bg-orange-500 hover:bg-orange-600"
         onClick={() => {
           dispatch(deleteRecipe(recipeId));
+          router.push("/");
         }}
       >
         Delete
       </Button>
       <Button
         className="text-sm text-white bg-orange-500 hover:bg-orange-600"
-        onClick={() => dispatch(toggleFavourite(recipeId))}
+        onClick={() => {
+          dispatch(toggleFavourite(recipeId));
+          router.push("/");
+        }}
       >
         🖤Favourite
       </Button>

@@ -29,14 +29,14 @@ export const recipeApi = {
   },
 
   update: async (id: string, recipe: Partial<Recipe>): Promise<Recipe> => {
-    const res = await api.post(`/api/recipe/${id}`, recipe);
+    const res = await api.put(`/api/recipes/${id}`, recipe);
     if (res.status < 200 || res.status >= 300)
       throw new Error("failed to update the recipe");
     return res.data;
   },
 
   remove: async (id: string): Promise<{ success: boolean; id: string }> => {
-    const res = await api.delete(`api/recipe/${id}`);
+    const res = await api.delete(`api/recipes/${id}`);
     if (res.status < 200 || res.status >= 300)
       throw new Error("failed to delete the recipe");
     return res.data;

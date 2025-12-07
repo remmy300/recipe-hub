@@ -1,17 +1,28 @@
 "use client";
-import { useAppSelector } from "@/redux/hooks";
+import { useAppSelector, useAppDispatch } from "@/redux/hooks";
 import Image from "next/image";
 import ProtectedRoute from "@/components/shared/ProtectedRoute";
 import { useParams } from "next/navigation";
 import RecipeActions from "../../recipeActions/page";
+import { useEffect } from "react";
+import { fetchRecipe } from "@/redux/features/recipes/recipeThunks";
 
 const RecipeDetails = () => {
   const { id } = useParams();
+  const dispatch = useAppDispatch();
+
   const recipe = useAppSelector((state) =>
     state.recipes.recipes.find((r) => r._id === id)
   );
+  const loading = useAppSelector((state) => state.recipes.loading);
 
-  if (!recipe) return <p>Loading recipe....</p>;
+  useEffect(() => {
+    if (id) {
+      dispatch(fetchRecipe(id as string));
+    }
+  }, [id, dispatch]);
+
+  if (loading || !recipe) return <p>Loading recipe....</p>;
 
   return (
     <ProtectedRoute>
@@ -33,6 +44,7 @@ const RecipeDetails = () => {
           <span>👤 {recipe.servings}</span>
           <span>📂 {recipe.category}</span>
         </div>
+
         <h2 className="text-xl font-semibold mt-2 pb-2">Ingredients</h2>
         <ul className="list-decimal ml-2">
           {recipe.ingredients.map((item, i) => (
@@ -46,6 +58,7 @@ const RecipeDetails = () => {
             <li key={i}>{step}</li>
           ))}
         </ol>
+
         <RecipeActions recipeId={recipe._id} />
       </div>
     </ProtectedRoute>

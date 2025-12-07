@@ -10,6 +10,7 @@ import {
 
 interface recipeState {
   recipes: Recipe[];
+  recipe: Recipe | null;
   selectedRecipe: Recipe | null;
   loading: boolean;
   error: string | null;
@@ -17,6 +18,7 @@ interface recipeState {
 
 const initialState: recipeState = {
   recipes: [],
+  recipe: null,
   selectedRecipe: null,
   loading: false,
   error: null,
@@ -52,6 +54,7 @@ const recipeSlice = createSlice({
     //Fetch recipes by ID
     builder.addCase(fetchRecipe.fulfilled, (state, action) => {
       state.selectedRecipe = action.payload;
+      state.recipe = action.payload;
     });
 
     //create a new recipe
