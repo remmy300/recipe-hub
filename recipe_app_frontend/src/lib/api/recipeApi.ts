@@ -53,4 +53,12 @@ export const recipeApi = {
     });
     return res.data;
   },
+  getFavorites: async (): Promise<Recipe[]> => {
+    const res = await api.get("/api/recipes/favorites", {
+      withCredentials: true,
+    });
+    if (res.status < 200 || res.status >= 300)
+      throw new Error("Failed to fetch favorite recipe data");
+    return res.data;
+  },
 };

@@ -1,13 +1,24 @@
 import multer from "multer";
-import cloudinary from "../config/cloudinary";
+import cloudinary from "../config/cloudinary.js";
 import { CloudinaryStorage } from "multer-storage-cloudinary";
 
 const storage = new CloudinaryStorage({
   cloudinary,
-  params: {
-    folder: "recipes",
-    allowed_formats: ["png", "jpg", "jpeg"],
-  } as any,
+  params: async (req, file) => {
+    return {
+      folder: "recipes",
+      allowed_formats: ["png", "jpg", "jpeg", "webp"],
+
+      transformation: [
+        {
+          width: 1200,
+          crop: "limit",
+          quality: "auto",
+          fetch_format: "auto",
+        },
+      ],
+    };
+  },
 });
 
 const upload = multer({ storage });

@@ -1,6 +1,9 @@
 "use client";
 import { useAppDispatch } from "@/redux/hooks";
-import { deleteRecipe } from "@/redux/features/recipes/recipeThunks";
+import {
+  deleteRecipe,
+  fetchFavourites,
+} from "@/redux/features/recipes/recipeThunks";
 import { toggleFavourite } from "@/redux/features/recipes/recipeThunks";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
@@ -20,6 +23,7 @@ const RecipeActions = ({ recipeId }: any) => {
         className="text-sm text-white bg-orange-500 hover:bg-orange-600"
         onClick={() => {
           dispatch(deleteRecipe(recipeId));
+
           router.push("/");
         }}
       >
@@ -28,8 +32,10 @@ const RecipeActions = ({ recipeId }: any) => {
       <Button
         className="text-sm text-white bg-orange-500 hover:bg-orange-600"
         onClick={() => {
+          console.log("toggle for recipe ID:", recipeId);
+
           dispatch(toggleFavourite(recipeId));
-          router.push("/");
+          dispatch(fetchFavourites());
         }}
       >
         🖤Favourite

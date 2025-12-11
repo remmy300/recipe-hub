@@ -21,6 +21,7 @@ const userSchema = new Schema<IUser>(
     password: {
       type: String,
       minlength: 6,
+      select: false,
       required: [true, "Password is required"],
     },
     avatar: { type: String, default: "" },

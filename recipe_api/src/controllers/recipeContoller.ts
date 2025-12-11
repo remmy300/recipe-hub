@@ -1,6 +1,18 @@
 import { Request, Response, NextFunction } from "express";
-import { Recipe } from "../models/Recipe";
-import { Types, InferSchemaType } from "mongoose";
+import { Recipe } from "../models/Recipe.js";
+import { Types } from "mongoose";
+import mongoose from "mongoose";
+
+const safeParse = (value: any) => {
+  if (!value) return [];
+  if (Array.isArray(value)) return value;
+
+  try {
+    return JSON.parse(value);
+  } catch {
+    return value.split(",").map((v: string) => v.trim());
+  }
+};
 
 // Fetch all recipes from the DB
 export const getRecipes = async (
@@ -25,6 +37,11 @@ export const getRecipe = async (
   next: NextFunction
 ) => {
   try {
+    const { id } = req.params;
+    // BLOCK INVALID IDS IMMEDIATELY
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ message: "Invalid recipe ID" });
+    }
     const recipe = await Recipe.findById(req.params.id);
     res.json(recipe);
   } catch (error) {
@@ -64,14 +81,19 @@ export const createRecipe = async (
     const { title, ingredients, description, instructions } = req.body;
     const newRecipe = new Recipe({
       title,
-      ingredients,
       description,
-      instructions,
-      imageUrl: req.file?.path,
+      instructions: safeParse(instructions),
+      cookingTime: Number(req.body.cookingTime),
+      servings: Number(req.body.servings),
+      ingredients: safeParse(ingredients),
+      imageUrl: req.file?.path || "",
       user: req.user._id,
     });
+
     const saved = await newRecipe.save();
     res.status(201).json(saved);
+    console.log("BODY:", req.body);
+    console.log("FILE:", req.file);
   } catch (error) {
     console.log("Error creating new recipe data:", error);
     res.status(500).json({ message: "Internal server error" });
@@ -87,10 +109,14 @@ export const deleteRecipe = async (
 ) => {
   try {
     const deletedRecipe = await Recipe.findByIdAndDelete(req.params.id);
-    res.json(deletedRecipe);
-    res.status(204).end();
+
+    if (!deletedRecipe) {
+      return res.status(404).json({ message: "Recipe not found" });
+    }
+
+    res.status(200).json({ success: true, id: req.params.id });
   } catch (error) {
-    console.log("Error deleting recipe data:", error);
+    console.error("Error deleting recipe:", error);
     res.status(500).json({ message: "Internal server error" });
     next(error);
   }
@@ -116,10 +142,11 @@ export const toggleLike = async (
     }
 
     await recipe.save();
-    res.status(200).json({
-      message: isLiked ? "Unliked recipe" : "Liked recipe",
-      likesCount: recipe.likes.length,
-    });
+    // Convert ObjectIds to strings before sending
+    const recipeObject = recipe.toObject();
+    recipeObject.likes = recipeObject.likes.map((id: any) => id.toString());
+
+    res.status(200).json(recipe);
   } catch (error) {
     next(error);
   }
@@ -131,28 +158,53 @@ export const toggleFavorite = async (
   next: NextFunction
 ) => {
   try {
+    const recipeId = req.params.id;
     const userId = new Types.ObjectId(req.user._id);
-    const recipe = await Recipe.findById(req.params.id);
 
-    if (!recipe) return res.status(404).json({ message: "Recipe not found" });
+    // Block invalid MongoDB IDs
+    if (!mongoose.Types.ObjectId.isValid(recipeId)) {
+      return res.status(400).json({ message: "Invalid recipe ID" });
+    }
+    console.log("incoming recipe id:", req.params._id);
+
+    const recipe = await Recipe.findById(recipeId);
+
+    if (!recipe) {
+      return res.status(404).json({ message: "Recipe not found" });
+    }
 
     const favorites = recipe.favorites as Types.ObjectId[];
+
     const isFavorited = favorites.some((id) => id.equals(userId));
 
     if (isFavorited) {
       recipe.favorites = favorites.filter((id) => !id.equals(userId));
     } else {
-      favorites.push(userId);
+      recipe.favorites.push(userId);
     }
 
-    await recipe.save();
+    const saved = await recipe.save();
 
-    res.status(200).json({
-      message: isFavorited ? "Removed from favorites" : "Added to favorites",
-      favoritesCount: favorites.length,
-    });
+    res.status(200).json(saved);
   } catch (error) {
-    console.error("Error toggling favorite:", error);
+    next(error);
+  }
+};
+
+export const fetchFavourites = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const userId = req.user._id;
+
+    const favorites = await Recipe.find({
+      favorites: userId,
+    });
+
+    res.status(200).json(favorites);
+  } catch (error) {
     next(error);
   }
 };

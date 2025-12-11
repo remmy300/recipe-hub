@@ -2,13 +2,16 @@
 
 import AppSidebar from "../sidebar";
 import { RxAvatar } from "react-icons/rx";
-import { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useAppSelector, useAppDispatch } from "@/redux/hooks";
 import { fetchRecipes } from "@/redux/features/recipes/recipeThunks";
+import { Heart } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { toggleLike } from "@/redux/features/recipes/recipeThunks";
+import { Card } from "../ui/card";
 
 const HomePage = () => {
   const [selectedCategory, setSelectedCategory] = useState("all");
@@ -16,7 +19,6 @@ const HomePage = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const dispatch = useAppDispatch();
   const recipes = useAppSelector((state) => state?.recipes.recipes);
-  console.log("logged recipe:", recipes);
 
   const user = useAppSelector((state) => state.auth.user);
 
@@ -28,6 +30,13 @@ const HomePage = () => {
     return (
       parts[0].charAt(0) + parts[parts.length - 1].charAt(0)
     ).toUpperCase();
+  };
+
+  const handleLike = (recipeId: string, e: React.MouseEvent) => {
+    e.preventDefault(); // prevent link  navigation
+    e.stopPropagation(); //prevent card clicking
+
+    dispatch(toggleLike(recipeId));
   };
 
   useEffect(() => {
@@ -86,7 +95,7 @@ const HomePage = () => {
           </div>
           <div className="flex items-center justify-end">
             {isClient && user ? (
-              <div className="w-10 h-10 rounded-full">
+              <div className="w-10 h-10 rounded-full bg-gray-300">
                 {getInitials(user.name ?? user.email)}
               </div>
             ) : (
@@ -150,39 +159,57 @@ const HomePage = () => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-center mt-3">
-          {filteredData?.map((recipe) => (
-            <Link
-              href={`recipes/${recipe._id}`}
-              key={recipe._id}
-              className="bg-white/95 dark:bg-gray-700 shadow-lg rounded-md overflow-hidden h-full hover:scale-105"
-            >
-              <Image
-                src={
-                  recipe.imageUrl
-                    ? recipe.imageUrl.startsWith("http")
-                      ? recipe.imageUrl //  Cloudinary
-                      : recipe.imageUrl // /images/... from public
-                    : "/placeholder.webp" //  fallback
-                }
-                alt={recipe.title}
-                width={400}
-                height={300}
-                className="h-30 w-full object-cover"
-                unoptimized
-              />
+          {filteredData?.map((recipe) => {
+            return (
+              <>
+                <Card className="p-0 overflow-hidden  shadow-md hover:scale-105">
+                  <Link
+                    href={`recipes/${recipe._id}`}
+                    key={recipe._id}
+                    className="relative"
+                  >
+                    <button
+                      onClick={(e) => handleLike(recipe._id, e)}
+                      className="absolute top-2 right-2 z-10 bg-white/90 backdrop-blur-sm rounded-full hover:bg-white transition-all hover:scale-110 shadow-md"
+                    >
+                      <Heart
+                        className={`w-5 h-5 transition-colors ${
+                          user?._id && recipe.likes.includes(user?._id)
+                            ? "fill-red-500 text-red-500"
+                            : "text-gray-600"
+                        }`}
+                      />
+                    </button>
+                    <div className="overflow-hidden rounded-t-lg">
+                      <Image
+                        src={
+                          recipe.imageUrl || "/placeholder.webp" //  fallback
+                        }
+                        alt={recipe.title}
+                        width={400}
+                        height={300}
+                        className="h-30 w-full object-cover overflow-hidden"
+                        unoptimized
+                      />
+                    </div>
 
-              <div className="p-4">
-                <h3 className="font-semibold text-lg mb-2">{recipe.title}</h3>
-                <p className="text-gray-600 text-sm mb-2 line-clamp-2">
-                  {recipe.description}
-                </p>
-                <div className="flex items-center justify-between text-sm text-gray-500">
-                  <span>⏱️ {recipe.cookingTime} mins</span>
-                  <span>👤 {recipe.servings}</span>
-                </div>
-              </div>
-            </Link>
-          ))}
+                    <div className="p-4 h-40">
+                      <h3 className="font-semibold text-lg mb-2">
+                        {recipe.title}
+                      </h3>
+                      <p className="text-gray-600 text-sm mb-2 line-clamp-2">
+                        {recipe.description}
+                      </p>
+                      <div className="flex items-center justify-between text-sm text-gray-500">
+                        <span>⏱️ {recipe.cookingTime} mins</span>
+                        <span>👤 {recipe.servings}</span>
+                      </div>
+                    </div>
+                  </Link>
+                </Card>
+              </>
+            );
+          })}
         </div>
       </div>
     </div>

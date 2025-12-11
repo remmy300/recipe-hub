@@ -1,5 +1,6 @@
 export interface User {
   interceptors: any;
+  _id: string;
   name: string;
   email: string;
   password: string;

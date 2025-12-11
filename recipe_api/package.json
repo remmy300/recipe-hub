@@ -6,6 +6,7 @@
   "scripts": {
     "test": "cross-env NODE_ENV=test jest --runInBand --detectOpenHandles",
     "dev": "tsx watch src/server.ts",
+    "seed": "tsx src/scripts/seedRecipes.ts",
     "build": "tsc",
     "start": "node dist/server.js"
   },
@@ -18,9 +19,11 @@
     "@upstash/redis": "^1.35.5",
     "bcryptjs": "^3.0.2",
     "cloudinary": "^1.41.3",
+    "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "dotenv": "^17.2.2",
     "express": "^5.1.0",
+    "google-auth-library": "^10.5.0",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.18.1",
     "multer": "^2.0.2",
@@ -28,6 +31,7 @@
   },
   "devDependencies": {
     "@types/bcryptjs": "^2.4.6",
+    "@types/cookie-parser": "^1.4.10",
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.3",
     "@types/jest": "^30.0.0",
@@ -40,6 +44,7 @@
     "mongodb-memory-server": "^10.2.3",
     "supertest": "^7.1.4",
     "ts-jest": "^29.4.4",
+    "ts-node": "^10.9.2",
     "tslib": "^2.8.1",
     "tsx": "^4.20.5",
     "typescript": "^5.9.2"

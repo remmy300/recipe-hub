@@ -8,12 +8,13 @@ const RecipeSchema = new Schema(
     description: { type: String, default: "" },
     cookingTime: { type: Number, default: 0 },
     servings: { type: Number, default: 1 },
-    image: { type: String, default: "" },
+    imageUrl: { type: String },
+    category: { type: String, default: "" },
     tags: { type: [String], default: [] },
     createdBy: { type: Types.ObjectId, ref: "User", default: null },
     likes: { type: [Schema.Types.ObjectId], default: [] },
     comments: { type: [Schema.Types.ObjectId], default: [] },
-    favorites: { type: [Schema.Types.ObjectId], ref: "User" },
+    favorites: [{ type: Schema.Types.ObjectId, ref: "User" }],
   },
   { timestamps: true }
 );

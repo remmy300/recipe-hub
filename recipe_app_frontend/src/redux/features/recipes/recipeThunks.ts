@@ -87,3 +87,17 @@ export const toggleLike = createAsyncThunk<
     return handleAxiosError(error, rejectWithValue) as never;
   }
 });
+
+export const fetchFavourites = createAsyncThunk<
+  Recipe[],
+  void,
+  { rejectValue: string }
+>("/recipe/getFavorites", async (_, { rejectWithValue }) => {
+  try {
+    const favorites = await recipeApi.getFavorites();
+
+    return favorites;
+  } catch (error) {
+    return handleAxiosError(error, rejectWithValue) as never;
+  }
+});

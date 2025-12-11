@@ -2,9 +2,9 @@ import {
   getCommentForRecipe,
   deleteCommentForRecipe,
   addComment,
-} from "../controllers/commentController";
+} from "../controllers/commentController.js";
 import express from "express";
-import { protect } from "../middleware/authMiddleware";
+import { protect } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 

@@ -10,6 +10,8 @@ export interface Recipe {
   cookingTime?: number;
   servings?: number;
   imageUrl?: string;
+  likes: string[];
+  favorites: string[];
   category?: string;
   createdBy?: string;
   createdAt?: string;

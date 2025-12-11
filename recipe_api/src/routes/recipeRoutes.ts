@@ -6,19 +6,21 @@ import {
   createRecipe,
   toggleFavorite,
   toggleLike,
-} from "../controllers/recipeContoller";
+  fetchFavourites,
+} from "../controllers/recipeContoller.js";
 import express from "express";
-import { protect } from "../middleware/authMiddleware";
-import upload from "../middleware/upload";
+import { protect } from "../middleware/authMiddleware.js";
+import upload from "../middleware/upload.js";
 
 const router = express.Router();
 
 router.get("/", getRecipes);
-router.get("/:id", getRecipe);
 router.post("/", upload.single("image"), protect, createRecipe);
-router.put("/:id", updateRecipe);
+router.get("/favorites", protect, fetchFavourites);
+router.put("/:id", protect, updateRecipe);
 router.delete("/:id", deleteRecipe);
 router.post("/:id/favorite", protect, toggleFavorite);
 router.post("/:id/like", protect, toggleLike);
+router.get("/:id", getRecipe);
 
 export default router;
