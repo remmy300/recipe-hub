@@ -17,7 +17,7 @@ Built with **TypeScript**, **Express**, **MongoDB**, and **React (Next.js)** —
 - **Upstash Redis** for rate limiting
 - **dotenv** for environment management
 
-### 💻 Frontend (In Progress)
+### 💻 Frontend 
 
 - **Next.js** (React + TypeScript)
 - **Tailwind CSS** + **ShadCN UI** for styling
@@ -29,7 +29,7 @@ Built with **TypeScript**, **Express**, **MongoDB**, and **React (Next.js)** —
 
 ## ⚙️ Features
 
-### ✅ Backend Completed
+### ✅ Backend 
 
 - **User Authentication** (Register, Login, Protected Routes)
 - **Recipe CRUD**
@@ -53,16 +53,16 @@ Built with **TypeScript**, **Express**, **MongoDB**, and **React (Next.js)** —
 
 ---
 
-### Frontend (Work in Progress)
+### 
 
-- [ ] Authentication pages (Register / Login)
-- [ ] Create & Edit Recipe forms
-- [ ] Recipe Feed (List all recipes)
-- [ ] Recipe Details Page (with image, likes, comments, etc.)
-- [ ] User Profile Page
-- [ ] Responsive layout with Tailwind
-- [ ] Favorites & Likes UI
-- [ ] Integration with backend API
+-  Authentication pages (Register / Login)
+-  Create & Edit Recipe forms
+-  Recipe Feed (List all recipes)
+-  Recipe Details Page (with image, likes, comments, etc.)
+-  User Profile Page
+-  Responsive layout with Tailwind
+-  Favorites & Likes UI
+-  Integration with backend API
 
 ---
 - Frontend Hosting: Vercel
@@ -108,7 +108,7 @@ Backend will run at:
 
 
 
-3️⃣ Frontend Setup (after building it)
+3️⃣ Frontend Setup
 cd recipe_client
 npm install
 npm run dev
