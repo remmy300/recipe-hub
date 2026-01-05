@@ -61,4 +61,12 @@ export const recipeApi = {
       throw new Error("Failed to fetch favorite recipe data");
     return res.data;
   },
+  fetchUserRecipes: async (userId: string): Promise<Recipe[]> => {
+    const res = await api.get(`/api/recipes/users/${userId}/recipes`, {
+      withCredentials: true,
+    });
+    if (res.status < 200 || res.status >= 300)
+      throw new Error("Failed to fetch user recipe data");
+    return res.data;
+  },
 };

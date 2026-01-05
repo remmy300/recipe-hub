@@ -25,7 +25,7 @@ import {
 
 import { logoutUser } from "@/redux/features/auth/authThunks";
 import { useRouter } from "next/navigation";
-import { useAppDispatch } from "@/redux/hooks";
+import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 
 // Menu items - Update URLs to actual routes
 const items = [
@@ -75,6 +75,14 @@ const footerItems = [
 const AppSidebar = () => {
   const dispatch = useAppDispatch();
   const router = useRouter();
+  const isAuth = useAppSelector((s) => s.auth.isAuthenticated);
+
+  // hide items that require auth for non-authenticated users
+  const authOnly = ["Add", "Favourite", "Profile", "Settings"];
+  const visibleItems = items.filter((it) =>
+    isAuth ? true : !authOnly.includes(it.title)
+  );
+
   return (
     <Sidebar collapsible="offcanvas">
       <SidebarContent>
@@ -87,7 +95,7 @@ const AppSidebar = () => {
           </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {items.map((item) => (
+              {visibleItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild>
                     <Link href={item.url}>
@@ -101,7 +109,6 @@ const AppSidebar = () => {
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
-
       <SidebarFooter>
         <SidebarMenu>
           {footerItems.map((item) => (
@@ -114,20 +121,32 @@ const AppSidebar = () => {
               </SidebarMenuButton>
             </SidebarMenuItem>
           ))}
+
+          {!isAuth && (
+            <SidebarMenuItem>
+              <SidebarMenuButton asChild size="sm">
+                <Link href="/login">
+                  <span className="text-lg">Login</span>
+                </Link>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          )}
         </SidebarMenu>
 
-        <SidebarMenuItem>
-          <SidebarMenuButton
-            size="sm"
-            onClick={async () => {
-              await dispatch(logoutUser()); //clears cookie & redux
-              router.push("/login"); // redirect
-            }}
-          >
-            <CiLogout className="h-4 w-4" />
-            <span className="text-lg">Log Out</span>
-          </SidebarMenuButton>
-        </SidebarMenuItem>
+        {isAuth && (
+          <SidebarMenuItem>
+            <SidebarMenuButton
+              size="sm"
+              onClick={async () => {
+                await dispatch(logoutUser()); //clears cookie & redux
+                router.push("/login"); // redirect
+              }}
+            >
+              <CiLogout className="h-4 w-4" />
+              <span className="text-lg">Log Out</span>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        )}
 
         {/* Copyright */}
         <div className="px-3 py-2 text-xs text-muted-foreground">

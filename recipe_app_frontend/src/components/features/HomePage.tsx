@@ -1,7 +1,6 @@
 "use client";
 
 import AppSidebar from "../sidebar";
-import { RxAvatar } from "react-icons/rx";
 import React, { useEffect, useMemo, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -12,6 +11,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { toggleLike } from "@/redux/features/recipes/recipeThunks";
 import { Card } from "../ui/card";
+import { useRouter } from "next/navigation";
 
 const HomePage = () => {
   const [selectedCategory, setSelectedCategory] = useState("all");
@@ -51,12 +51,6 @@ const HomePage = () => {
     if (user === null) return;
   }, [user]);
 
-  // get unique category
-  const category = [
-    "all",
-    ...new Set(recipes.map((recipe) => recipe.category)),
-  ];
-
   const filteredData = useMemo(() => {
     return recipes.filter((recipe) => {
       // category filter
@@ -93,15 +87,24 @@ const HomePage = () => {
               onChange={(e) => setSearchQuery(e.target.value)}
             />
           </div>
-          <div className="flex items-center justify-end">
+
+          <Link href="/profile" className="flex items-center justify-end">
             {isClient && user ? (
-              <div className="w-10 h-10 rounded-full bg-gray-300">
-                {getInitials(user.name ?? user.email)}
+              <div className="relative w-10 h-10 overflow-hidden rounded-full bg-gray-300">
+                <Image
+                  src={user.avatar || "/placeholder.webp"}
+                  alt={user.name}
+                  fill
+                  priority
+                  className="object-cover"
+                />
               </div>
             ) : (
-              <RxAvatar size={30} />
+              <div className="w-10 h-10 rounded-full bg-gray-300">
+                {getInitials(user?.name ?? user?.email)}
+              </div>
             )}
-          </div>
+          </Link>
         </div>
 
         {/* Filter Tabs */}
@@ -180,17 +183,16 @@ const HomePage = () => {
                         }`}
                       />
                     </button>
-                    <div className="overflow-hidden rounded-t-lg">
-                      <Image
-                        src={
-                          recipe.imageUrl || "/placeholder.webp" //  fallback
-                        }
-                        alt={recipe.title}
-                        width={400}
-                        height={300}
-                        className="h-30 w-full object-cover overflow-hidden"
-                        unoptimized
-                      />
+                    <div className="rounded-t-lg overflow-hidden">
+                      <div className="relative aspect-[4/3]">
+                        <Image
+                          src={recipe.imageUrl || "/placeholder.webp"}
+                          alt={recipe.title}
+                          fill
+                          className="object-cover"
+                          priority
+                        />
+                      </div>
                     </div>
 
                     <div className="p-4 h-40">

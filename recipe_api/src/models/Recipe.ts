@@ -11,7 +11,7 @@ const RecipeSchema = new Schema(
     imageUrl: { type: String },
     category: { type: String, default: "" },
     tags: { type: [String], default: [] },
-    createdBy: { type: Types.ObjectId, ref: "User", default: null },
+    createdBy: { type: Types.ObjectId, ref: "User" },
     likes: { type: [Schema.Types.ObjectId], default: [] },
     comments: { type: [Schema.Types.ObjectId], default: [] },
     favorites: [{ type: Schema.Types.ObjectId, ref: "User" }],

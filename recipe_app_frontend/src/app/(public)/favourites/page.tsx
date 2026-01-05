@@ -43,10 +43,10 @@ const FavoritePage = () => {
               <h1 className="text-lg mt-2 font-semibold">{recipe.title}</h1>
               <h2 className="mt-2 text-md">{recipe.description}</h2>
               <div className="flex justify-between items-center mt-3 gap-4">
-                <span className="text-sm">{recipe.cookingTime}mins</span>
-                <span className="text-sm">{recipe.servings}</span>
-                <span className="bg-orange-500 text-md font-semibold text-nowrap">
-                  <Heart className="" /> Favorite
+                <span className="text-md">{recipe.cookingTime}mins</span>
+                <span className="text-md">{recipe.servings}</span>
+                <span className=" text-md font-semibold text-nowrap">
+                  <Heart className="fill-orange-500" />
                 </span>
               </div>
             </div>

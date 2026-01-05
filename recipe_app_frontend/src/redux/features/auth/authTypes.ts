@@ -1,10 +1,14 @@
+import { Recipe } from "../recipes/recipeTypes";
 export interface User {
-  interceptors: any;
   _id: string;
   name: string;
   email: string;
   password: string;
   avatar?: string;
+  bio: string;
+  followers: string[];
+  following: string[];
+  recipes: Recipe[];
 }
 
 export interface AuthState {
@@ -13,4 +17,5 @@ export interface AuthState {
   loading: boolean;
   error: string | null;
   isAuthenticated: boolean;
+  isFollowing: boolean;
 }

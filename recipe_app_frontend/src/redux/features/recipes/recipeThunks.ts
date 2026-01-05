@@ -4,6 +4,7 @@ import { CreateRecipePayload } from "./recipeTypes";
 
 import { handleAxiosError } from "@/lib/Error";
 import { Recipe } from "./recipeTypes";
+import next from "next";
 
 export const fetchRecipes = createAsyncThunk<
   Recipe[], //  return type
@@ -97,6 +98,18 @@ export const fetchFavourites = createAsyncThunk<
     const favorites = await recipeApi.getFavorites();
 
     return favorites;
+  } catch (error) {
+    return handleAxiosError(error, rejectWithValue) as never;
+  }
+});
+
+export const getUserRecipes = createAsyncThunk<
+  Recipe[],
+  string,
+  { rejectValue: string }
+>("/users/recipes", async (userId: string, { rejectWithValue }) => {
+  try {
+    return await recipeApi.fetchUserRecipes(userId);
   } catch (error) {
     return handleAxiosError(error, rejectWithValue) as never;
   }

@@ -6,30 +6,14 @@ const storage = new CloudinaryStorage({
   cloudinary,
   params: async (req, file) => {
     return {
-      folder: "recipes",
+      folder: "avatars",
       allowed_formats: ["png", "jpg", "jpeg", "webp"],
-      // primary transformation for the uploaded resource
       transformation: [
         {
-          width: 1200,
-          crop: "limit",
-          quality: "auto:eco",
-          fetch_format: "auto",
-          dpr: "auto",
-        },
-      ],
-      // eager creates derived (optimized) versions at upload time
-      eager: [
-        {
-          width: 400,
-          crop: "limit",
-          quality: "auto:eco",
-          fetch_format: "auto",
-        },
-        {
           width: 800,
+          height: 800,
           crop: "limit",
-          quality: "auto:eco",
+          quality: "auto",
           fetch_format: "auto",
         },
       ],

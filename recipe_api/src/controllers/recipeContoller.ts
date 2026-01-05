@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import { Recipe } from "../models/Recipe.js";
 import { Types } from "mongoose";
 import mongoose from "mongoose";
+import { User } from "../models/User.js";
 
 const safeParse = (value: any) => {
   if (!value) return [];
@@ -79,6 +80,7 @@ export const createRecipe = async (
 ) => {
   try {
     const { title, ingredients, description, instructions } = req.body;
+    const userId = req.user._id;
     const newRecipe = new Recipe({
       title,
       description,
@@ -88,15 +90,36 @@ export const createRecipe = async (
       ingredients: safeParse(ingredients),
       imageUrl: req.file?.path || "",
       user: req.user._id,
+      createdBy: req.user._id,
     });
 
     const saved = await newRecipe.save();
+
     res.status(201).json(saved);
     console.log("BODY:", req.body);
     console.log("FILE:", req.file);
   } catch (error) {
     console.log("Error creating new recipe data:", error);
     res.status(500).json({ message: "Internal server error" });
+    next(error);
+  }
+};
+
+//get user recipes
+
+export const fetchUserRecipes = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { id } = req.params;
+    const recipes = await Recipe.find({ createdBy: id }).populate(
+      "createdBy",
+      "name email avatar"
+    );
+    res.status(200).json(recipes);
+  } catch (error) {
     next(error);
   }
 };

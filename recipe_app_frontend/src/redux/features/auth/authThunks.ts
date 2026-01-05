@@ -1,8 +1,6 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { User } from "./authTypes";
-import { AuthState } from "./authTypes";
 import { authApi } from "@/lib/api/authApi";
-import { AxiosError } from "axios";
 
 // Register user thunk
 export const registerUser = createAsyncThunk<
@@ -86,3 +84,78 @@ export const logoutUser = createAsyncThunk<void, void, { rejectValue: string }>(
     }
   }
 );
+
+export const toggleFollow = createAsyncThunk<
+  { following: boolean },
+  //return type
+  string, //argument type
+  { rejectValue: string }
+>("followToggle", async (targetUserId, { rejectWithValue }) => {
+  try {
+    return await authApi.followToggle(targetUserId);
+  } catch (err: unknown) {
+    if (err instanceof Error) {
+      return rejectWithValue(err.message);
+    }
+    return rejectWithValue("Failed to follow");
+  }
+});
+
+export const updateProfileThunk = createAsyncThunk<
+  User,
+  { name?: string; bio?: string; avatar?: string },
+  { rejectValue: string }
+>("auth/updateProfile", async (data, { rejectWithValue }) => {
+  try {
+    const updated = await authApi.updateProfile(data);
+    return updated;
+  } catch (err: any) {
+    if (err.response?.status === 401) {
+      return rejectWithValue("UNAUTHORIZED");
+    }
+    if (err instanceof Error) {
+      return rejectWithValue(err.message);
+    }
+    return rejectWithValue("Failed to update profile");
+  }
+});
+
+export const changePasswordThunk = createAsyncThunk<
+  { message: string },
+  { oldPassword: string; newPassword: string },
+  { rejectValue: string }
+>("auth/changePassword", async (payload, { rejectWithValue }) => {
+  try {
+    const res = await authApi.changePassword(payload);
+    return res;
+  } catch (err: any) {
+    if (err.response?.status === 401) {
+      return rejectWithValue("UNAUTHORIZED");
+    }
+    if (err instanceof Error) {
+      return rejectWithValue(err.message);
+    }
+    return rejectWithValue("Failed to change password");
+  }
+});
+
+export const deleteAccountThunk = createAsyncThunk<
+  { message: string },
+  void,
+  { rejectValue: string }
+>("auth/deleteAccount", async (_, { rejectWithValue }) => {
+  try {
+    const res = await authApi.deleteAccount();
+    return res;
+  } catch (err: any) {
+    if (err.response?.status === 401) {
+      return rejectWithValue("UNAUTHORIZED");
+    }
+    if (err instanceof Error) {
+      return rejectWithValue(err.message);
+    }
+    return rejectWithValue("Failed to delete account");
+  }
+});
+
+//Async thunks in Redux Toolkit are strongly typed by explicitly declaring the argument and return types, ensuring predictable state updates and safer async logic.

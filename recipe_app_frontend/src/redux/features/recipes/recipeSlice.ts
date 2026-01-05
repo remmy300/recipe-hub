@@ -9,8 +9,8 @@ import {
   toggleLike,
   toggleFavourite,
   fetchFavourites,
+  getUserRecipes,
 } from "./recipeThunks";
-import { act } from "react";
 
 interface recipeState {
   recipes: Recipe[];
@@ -118,6 +118,11 @@ const recipeSlice = createSlice({
       state.error = action.payload as string;
     });
 
+    //userRecipes
+    builder.addCase(getUserRecipes.fulfilled, (state, action) => {
+      state.recipes = action.payload;
+    });
+
     //toggle favourite
     builder.addCase(toggleFavourite.fulfilled, (state, action) => {
       const id = action.payload._id;
@@ -130,7 +135,7 @@ const recipeSlice = createSlice({
         const recipe = state.recipes.find((r) => r._id === id);
 
         if (recipe) {
-          state.favorites.push(recipe );
+          state.favorites.push(recipe);
         }
       }
     });

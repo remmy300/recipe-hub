@@ -51,4 +51,33 @@ export const authApi = {
     });
     return res.data;
   },
+  followToggle: async (
+    targetUserId: string
+  ): Promise<{ following: boolean }> => {
+    const res = await api.post(`/api/auth/${targetUserId}/follow`);
+    return res.data;
+  },
+  updateProfile: async ({
+    name,
+    bio,
+    avatar,
+  }: {
+    name?: string;
+    bio?: string;
+    avatar?: string;
+  }): Promise<User> => {
+    const res = await api.post("/api/auth/editProfile", { name, bio, avatar });
+    return res.data;
+  },
+  changePassword: async (payload: {
+    oldPassword: string;
+    newPassword: string;
+  }): Promise<{ message: string }> => {
+    const res = await api.post("/api/auth/changePassword", payload);
+    return res.data;
+  },
+  deleteAccount: async (): Promise<{ message: string }> => {
+    const res = await api.delete("/api/auth/deleteAccount");
+    return res.data;
+  },
 };

@@ -5,9 +5,11 @@ import {
   fetchUserProfile,
   userGoogleLogin,
   logoutUser,
+  toggleFollow,
 } from "./authThunks";
+import { updateProfileThunk } from "./authThunks";
+import { changePasswordThunk, deleteAccountThunk } from "./authThunks";
 import { AuthState } from "./authTypes";
-import { act } from "react";
 
 const initialState: AuthState = {
   user: null,
@@ -15,6 +17,7 @@ const initialState: AuthState = {
   loading: false,
   error: null,
   isAuthenticated: false,
+  isFollowing: false,
 };
 
 const authSlice = createSlice({
@@ -50,6 +53,21 @@ const authSlice = createSlice({
         state.isAuthenticated = true;
       }
     );
+    builder.addCase(
+      updateProfileThunk.fulfilled,
+      (state, action: PayloadAction<User>) => {
+        state.loading = false;
+        state.user = action.payload;
+        state.isAuthenticated = true;
+      }
+    );
+    builder.addCase(
+      changePasswordThunk.fulfilled,
+      (state, action: PayloadAction<{ message: string }>) => {
+        state.loading = false;
+        // password changed; nothing else to update in state
+      }
+    );
     builder.addCase(userGoogleLogin.fulfilled, (state, action) => {
       state.loading = false;
       state.user = action.payload.user;
@@ -69,6 +87,20 @@ const authSlice = createSlice({
       }
     });
 
+    builder.addCase(toggleFollow.fulfilled, (state, action) => {
+      state.loading = false;
+      state.isFollowing = action.payload.following;
+    });
+
+    builder.addCase(deleteAccountThunk.fulfilled, (state) => {
+      state.user = null;
+      state.token = null;
+      state.isAuthenticated = false;
+      if (typeof window !== "undefined") {
+        localStorage.removeItem("token");
+      }
+    });
+
     builder.addMatcher(isAnyOf(fetchUserProfile.rejected), (state, action) => {
       state.loading = false;
 
@@ -83,11 +115,31 @@ const authSlice = createSlice({
     });
 
     builder.addMatcher(
+      isAnyOf(updateProfileThunk.rejected),
+      (state, action) => {
+        state.loading = false;
+
+        if (action.payload === "UNAUTHORIZED") {
+          state.user = null;
+          state.token = null;
+          state.isAuthenticated = false;
+          return;
+        }
+
+        state.error = action.payload as string;
+      }
+    );
+
+    builder.addMatcher(
       isAnyOf(
         loginUser.pending,
         fetchUserProfile.pending,
         userGoogleLogin.pending,
-        logoutUser.pending
+        updateProfileThunk.pending,
+        logoutUser.pending,
+        changePasswordThunk.pending,
+        deleteAccountThunk.pending,
+        toggleFollow.pending
       ),
       (state) => {
         state.loading = true;
@@ -99,7 +151,11 @@ const authSlice = createSlice({
       isAnyOf(
         loginUser.rejected,
         userGoogleLogin.rejected,
-        logoutUser.rejected
+        updateProfileThunk.rejected,
+        logoutUser.rejected,
+        changePasswordThunk.rejected,
+        deleteAccountThunk.rejected,
+        toggleFollow.rejected
       ),
       (state, action) => {
         state.loading = false;
