@@ -11,7 +11,6 @@ import Image from "next/image";
 import Link from "next/link";
 import { toggleLike } from "@/redux/features/recipes/recipeThunks";
 import { Card } from "../ui/card";
-import { useRouter } from "next/navigation";
 
 const HomePage = () => {
   const [selectedCategory, setSelectedCategory] = useState("all");
@@ -58,10 +57,15 @@ const HomePage = () => {
         selectedCategory === "all" || recipe.category === selectedCategory;
 
       // filter by search query
+
+      const createdByText =
+        typeof recipe.createdBy === "string"
+          ? recipe.createdBy
+          : recipe.createdBy?.name ?? "";
       const matchesSearchQuery =
         searchQuery === "" ||
         recipe.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        recipe.createdBy?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        createdByText?.toLowerCase().includes(searchQuery.toLowerCase()) ||
         recipe.ingredients
           .join("")
           .toLowerCase()
