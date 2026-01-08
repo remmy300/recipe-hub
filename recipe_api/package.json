@@ -2,7 +2,7 @@
   "name": "recipe_api",
   "version": "1.0.0",
   "description": "",
-  "main": "server.js",
+  "main": "dist/server.js",
   "scripts": {
     "test": "cross-env NODE_ENV=test jest --runInBand --detectOpenHandles",
     "dev": "tsx watch src/server.ts",
