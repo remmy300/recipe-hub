@@ -7,7 +7,7 @@ import {
   Types,
   HydratedDocument,
 } from "mongoose";
-import bycrypt from "bcryptjs";
+import bcrypt from "bcryptjs";
 
 //interface for the document
 export interface IUser {
@@ -19,6 +19,7 @@ export interface IUser {
   following: Types.ObjectId[];
   recipes: Types.ObjectId[];
   avatar?: string;
+  provider?: "local" | "google";
   matchPassword(enteredPassword: string): Promise<boolean>;
 }
 
@@ -31,12 +32,20 @@ const userSchema = new Schema<IUser>(
       unique: true,
       required: [true, "Email is required"],
     },
+    provider: {
+      type: String,
+      enum: ["local", "google"],
+      default: "local",
+    },
     password: {
       type: String,
       minlength: 6,
       select: false,
-      required: [true, "Password is required"],
+      required: function (this: any) {
+        return this.provider === "local";
+      },
     },
+
     bio: { type: String, default: "" },
     followers: [{ type: Schema.Types.ObjectId, ref: "User" }],
     following: [{ type: Schema.Types.ObjectId, ref: "User" }],
@@ -49,8 +58,8 @@ const userSchema = new Schema<IUser>(
 //Pre-save hook for hashing the password....runs beforea doc is saved in the DB
 userSchema.pre("save", async function (next) {
   if (!this.isModified("password")) return next(); //only hash if  new password has changed
-  const salt = await bycrypt.genSalt(10); // generate random strings to be added to the created password
-  this.password = await bycrypt.hash(this.password, salt); //add the generated random string to the password before hashing
+  const salt = await bcrypt.genSalt(10); // generate random strings to be added to the created password
+  this.password = await bcrypt.hash(this.password, salt); //add the generated random string to the password before hashing
   next();
 });
 
@@ -60,7 +69,7 @@ userSchema.methods.matchPassword = async function (
   this: HydratedDocument<IUser>,
   enteredPassword: string
 ) {
-  return await bycrypt.compare(enteredPassword, this.password);
+  return await bcrypt.compare(enteredPassword, this.password);
 };
 
 export const User = model<IUser>("User", userSchema);

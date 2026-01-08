@@ -17,7 +17,13 @@ export const registerUser = async (req: Request, res: Response) => {
       return res.status(400).json({ message: "User already exists" });
     }
 
-    const user = await User.create({ name, email, password, avatar });
+    const user = await User.create({
+      name,
+      email: email.toLowerCase(),
+      password,
+      avatar,
+      provider: "local",
+    });
 
     const token = generateToken(user._id.toString());
 
@@ -97,12 +103,18 @@ export const googleLogin = async (req: Request, res: Response) => {
     let user = await User.findOne({ email });
     console.log("Creating new user for:", email);
 
+    if (user?.provider === "google") {
+      return res.status(401).json({
+        message: "Please sign in using Google",
+      });
+    }
+
     if (!user) {
       user = await User.create({
         name,
-        email,
+        email: email.toLowerCase(),
         avatar: picture,
-        password: Math.random().toString(36).slice(-20),
+        provider: "local",
       });
     }
 
