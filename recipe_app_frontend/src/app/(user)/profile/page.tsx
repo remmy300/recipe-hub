@@ -67,12 +67,12 @@ const UserProfile = () => {
       {/* Stats */}
       <div className="flex gap-8 mt-6 text-center">
         <div>
-          <p className="text-xl font-bold">{user?.followers.length}</p>
+          <p className="text-xl font-bold">{(user?.followers || []).length}</p>
           <span className="text-gray-900">Followers</span>
         </div>
 
         <div>
-          <p className="text-xl font-bold">{user?.following.length}</p>
+          <p className="text-xl font-bold">{(user?.following || []).length}</p>
           <span className="text-gray-900">Following</span>
         </div>
 

@@ -1,9 +1,8 @@
-// src/lib/api/api.ts
 import axios from "axios";
 import { AxiosError } from "axios";
 
 const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL,
+  baseURL: process.env.NEXT_PUBLIC_API_URL || "",
   withCredentials: true,
 });
 
