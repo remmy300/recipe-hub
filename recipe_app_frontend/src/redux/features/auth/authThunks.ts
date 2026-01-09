@@ -22,7 +22,11 @@ export const registerUser = createAsyncThunk<
 
 // Login user thunk
 export const loginUser = createAsyncThunk<
-  { user: User; token: string },
+  {
+    payload: string;
+    user: User;
+    token: string;
+  },
   { email: string; password: string },
   { rejectValue: string }
 >("auth/login", async (credentials, { rejectWithValue }) => {
@@ -147,15 +151,16 @@ export const deleteAccountThunk = createAsyncThunk<
   try {
     const res = await authApi.deleteAccount();
     return res;
-  } catch (err: any) {
-    if (err.response?.status === 401) {
-      return rejectWithValue("UNAUTHORIZED");
-    }
+  } catch (err: unknown) {
     if (err instanceof Error) {
       return rejectWithValue(err.message);
+    }
+    if (typeof err === 'object' && err !== null && 'response' in err && (err as any).response?.status === 401) {
+      return rejectWithValue("UNAUTHORIZED");
     }
     return rejectWithValue("Failed to delete account");
   }
 });
+
 
 //Async thunks in Redux Toolkit are strongly typed by explicitly declaring the argument and return types, ensuring predictable state updates and safer async logic.

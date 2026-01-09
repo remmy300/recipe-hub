@@ -29,14 +29,11 @@ const LoginPage = () => {
     }
 
     try {
-      const result = await dispatch(loginUser({ email, password }));
+      await dispatch(loginUser({ email, password })).unwrap();
 
-      if (loginUser.fulfilled.match(result)) {
-        // Redirect
-        router.push("/add-recipe");
-      } else {
-        setError((result.payload as string) || "Login failed");
-      }
+      // Redirect
+      router.replace("/add-recipe");
+      router.refresh();
     } catch (err: any) {
       setError(err?.response?.data?.message || "Login failed");
     } finally {

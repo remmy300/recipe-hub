@@ -22,7 +22,7 @@ const HomePage = () => {
   const user = useAppSelector((state) => state.auth.user);
 
   const getInitials = (nameOrEmail?: string | null) => {
-    if (!nameOrEmail) return;
+    if (!nameOrEmail) return "";
     const s = nameOrEmail.trim();
     const parts = s.split(/\s+/);
     if (parts.length === 1) return parts[0].charAt(0).toUpperCase();
@@ -93,10 +93,10 @@ const HomePage = () => {
           </div>
 
           <Link href="/profile" className="flex items-center justify-end">
-            {isClient && user ? (
+            {isClient && user && user.avatar ? (
               <div className="relative w-10 h-10 overflow-hidden rounded-full bg-gray-300">
                 <Image
-                  src={user.avatar || "/placeholder.webp"}
+                  src={user.avatar}
                   alt={user.name}
                   fill
                   priority
@@ -104,7 +104,7 @@ const HomePage = () => {
                 />
               </div>
             ) : (
-              <div className="w-10 h-10 rounded-full bg-gray-300">
+              <div className="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center text-sm font-semibold">
                 {getInitials(user?.name ?? user?.email)}
               </div>
             )}

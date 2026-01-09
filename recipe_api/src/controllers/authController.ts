@@ -29,6 +29,16 @@ export const registerUser = async (req: Request, res: Response) => {
 
     // Save token in cookie
     res.cookie("token", token, cookieOptions as CookieOptions);
+    if (process.env.NODE_ENV !== "production") {
+      try {
+        console.log("SET COOKIE (register):", {
+          token: `${String(token).slice(0, 6)}...`,
+          sameSite: (cookieOptions as any).sameSite,
+          secure: (cookieOptions as any).secure,
+          httpOnly: (cookieOptions as any).httpOnly,
+        });
+      } catch (e) {}
+    }
 
     res.status(201).json({
       _id: user._id,
@@ -48,16 +58,34 @@ export const loginUser = async (req: Request, res: Response) => {
   const { email, password } = req.body;
 
   try {
-    const user = await User.findOne({ email }).select("+password");
+    const user = await User.findOne({ email: email.toLowerCase() }).select(
+      "+password"
+    );
 
     if (!user || !(await user.matchPassword(password))) {
       return res.status(401).json({ message: "Invalid email or password" });
+    }
+
+    if (user.provider === "google") {
+      return res.status(400).json({
+        message: "This account uses Google login. Please sign in with Google.",
+      });
     }
 
     const token = generateToken(user._id.toString());
 
     // Save token in cookie
     res.cookie("token", token, cookieOptions as CookieOptions);
+    if (process.env.NODE_ENV !== "production") {
+      try {
+        console.log("SET COOKIE (login):", {
+          token: `${String(token).slice(0, 6)}...`,
+          sameSite: (cookieOptions as any).sameSite,
+          secure: (cookieOptions as any).secure,
+          httpOnly: (cookieOptions as any).httpOnly,
+        });
+      } catch (e) {}
+    }
 
     res.json({
       _id: user._id,
@@ -87,7 +115,12 @@ export const googleLogin = async (req: Request, res: Response) => {
     });
 
     const payload = ticket.getPayload();
-    console.log("Google payload received:", payload?.email);
+    if (process.env.NODE_ENV !== "production") {
+      console.log("Google payload received:", {
+        email: payload?.email,
+        name: payload?.name,
+      });
+    }
 
     if (!payload || !payload.email) {
       return res.status(400).json({ message: "Invalid Google token" });
@@ -100,27 +133,54 @@ export const googleLogin = async (req: Request, res: Response) => {
     };
 
     // check if user exists
-    let user = await User.findOne({ email });
-    console.log("Creating new user for:", email);
-
-    if (user?.provider === "google") {
-      return res.status(401).json({
-        message: "Please sign in using Google",
+    let user = await User.findOne({ email: email.toLowerCase() });
+    if (process.env.NODE_ENV !== "production") {
+      console.log("Google login for:", {
+        email,
+        foundUser: !!user,
+        provider: user?.provider,
       });
     }
 
+    // If an account exists registered with local credentials, ask user to sign in with email/password
+    if (user && user.provider === "local") {
+      if (process.env.NODE_ENV !== "production") {
+        console.log(
+          "Google login blocked: existing local provider account for",
+          email
+        );
+      }
+      return res
+        .status(401)
+        .json({ message: "Please sign in using email and password" });
+    }
+
+    // Create a new google user if none exists
     if (!user) {
       user = await User.create({
         name,
         email: email.toLowerCase(),
         avatar: picture,
-        provider: "local",
+        provider: "google",
       });
+      if (process.env.NODE_ENV !== "production") {
+        console.log("Created new google user for:", email);
+      }
     }
 
     const jwtToken = generateToken(user._id.toString());
 
     res.cookie("token", jwtToken, cookieOptions as CookieOptions);
+    if (process.env.NODE_ENV !== "production") {
+      try {
+        console.log("SET COOKIE (google):", {
+          token: `${String(jwtToken).slice(0, 6)}...`,
+          sameSite: (cookieOptions as any).sameSite,
+          secure: (cookieOptions as any).secure,
+          httpOnly: (cookieOptions as any).httpOnly,
+        });
+      } catch (e) {}
+    }
 
     res.json({
       _id: user._id,
@@ -270,6 +330,16 @@ export const changePassword = async (req: Request, res: Response) => {
     // issue new token and set cookie
     const token = generateToken(user._id.toString());
     res.cookie("token", token, cookieOptions as CookieOptions);
+    if (process.env.NODE_ENV !== "production") {
+      try {
+        console.log("SET COOKIE (changePassword):", {
+          token: `${String(token).slice(0, 6)}...`,
+          sameSite: (cookieOptions as any).sameSite,
+          secure: (cookieOptions as any).secure,
+          httpOnly: (cookieOptions as any).httpOnly,
+        });
+      } catch (e) {}
+    }
 
     res.json({ message: "Password changed successfully" });
   } catch (error) {

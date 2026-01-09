@@ -3,37 +3,36 @@
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { fetchUserProfile } from "@/redux/features/auth/authThunks";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 
 export default function ProtectedRoute({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const [isChecking, setIsChecking] = useState(true);
   const router = useRouter();
   const dispatch = useAppDispatch();
   const { user, loading } = useAppSelector((state) => state.auth);
 
+  //  fetch user once on mount
   useEffect(() => {
-    const checkAuth = async () => {
-      if (!user) {
-        await dispatch(fetchUserProfile());
-      }
-      setIsChecking(false);
-    };
-    checkAuth();
-  }, [dispatch, user]);
+    dispatch(fetchUserProfile());
+  }, [dispatch]);
 
+  // Redirect only AFTER loading is finished
   useEffect(() => {
-    if (!loading && !user && !isChecking) {
+    if (!loading && !user) {
       router.replace("/login");
     }
-  }, [user, loading, router, isChecking]);
+  }, [loading, user, router]);
 
-  if (loading || isChecking) return <p>Checking authentication...</p>;
+  if (loading) {
+    return <p>Checking authentication...</p>;
+  }
 
-  if (!user) return null;
+  if (!user) {
+    return null;
+  }
 
   return <>{children}</>;
 }

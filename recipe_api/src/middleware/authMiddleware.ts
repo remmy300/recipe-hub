@@ -18,6 +18,12 @@ export const protect = async (
   next: NextFunction
 ) => {
   let token: string | undefined;
+  // DEBUG: log incoming auth-related headers/cookies (dev only)
+  if (process.env.NODE_ENV !== "production") {
+    console.log("authMiddleware: origin=", req.headers.origin);
+    console.log("authMiddleware: cookies=", req.cookies);
+    console.log("authMiddleware: authorization=", req.headers.authorization);
+  }
 
   // CHECK COOKIE FIRST
   if (req.cookies && req.cookies.token) {

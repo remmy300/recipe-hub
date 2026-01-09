@@ -26,7 +26,8 @@ export const authApi = {
     token: string
   ): Promise<{ user: User; token?: string }> => {
     const res = await api.post("/api/auth/google", { token });
-    return res.data;
+    // backend returns user fields at root plus token; normalize to { user, token }
+    return { user: res.data, token: res.data.token };
   },
 
   loginUser: async (credentials: {
