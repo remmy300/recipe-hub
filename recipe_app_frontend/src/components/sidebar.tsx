@@ -77,11 +77,12 @@ const AppSidebar = () => {
   const router = useRouter();
   const isAuth = useAppSelector((s) => s.auth.isAuthenticated);
 
-  // hide items that require auth for non-authenticated users
-  const authOnly = ["Add", "Favourite", "Profile", "Settings"];
-  const visibleItems = items.filter((it) =>
-    isAuth ? true : !authOnly.includes(it.title)
-  );
+  const protectedRoutes = [
+    "/add-recipe",
+    "/favourites",
+    "/profile",
+    "/settings",
+  ];
 
   return (
     <Sidebar collapsible="offcanvas">
@@ -95,13 +96,22 @@ const AppSidebar = () => {
           </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {visibleItems.map((item) => (
+              {items.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild>
-                    <Link href={item.url}>
+                    <button
+                      onClick={() => {
+                        if (protectedRoutes.includes(item.url) && !isAuth) {
+                          router.push("/login");
+                        } else {
+                          router.push(item.url);
+                        }
+                      }}
+                      className="flex items-center gap-2 w-full"
+                    >
                       <item.icon />
                       <span className="text-lg">{item.title}</span>
-                    </Link>
+                    </button>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
