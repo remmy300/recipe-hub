@@ -69,9 +69,10 @@ const authSlice = createSlice({
       }
     );
     builder.addCase(userGoogleLogin.fulfilled, (state, action) => {
-      state.loading = false;
       state.user = action.payload.user;
+      state.token = action.payload.token ?? null;
       state.isAuthenticated = true;
+
       if (action.payload.token) {
         state.token = action.payload.token;
         localStorage.setItem("token", action.payload.token);
