@@ -1,6 +1,7 @@
 "use client";
 
 import AppSidebar from "../sidebar";
+import { SidebarTrigger } from "../ui/sidebar";
 import React, { useEffect, useMemo, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -57,7 +58,7 @@ const HomePage = () => {
       const createdByText =
         typeof recipe.createdBy === "string"
           ? recipe.createdBy
-          : recipe.createdBy?.name ?? "";
+          : (recipe.createdBy?.name ?? "");
       const matchesSearchQuery =
         searchQuery === "" ||
         recipe.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -71,15 +72,18 @@ const HomePage = () => {
   }, [recipes, searchQuery, selectedCategory]);
 
   return (
-    <div className="min-h-screen bg-white/95 flex flex-col ">
+    <div className="min-h-screen bg-white/95 flex flex-col  ">
       {/* Sidebar */}
       <AppSidebar />
 
       {/* Main content area */}
-      <div className="flex-1 w-full px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
+      <div className="flex-1 w-full px-4 sm:px-6 pt-10 lg:px-8 py-4 sm:py-6">
         <div className="max-w-7xl mx-auto">
           {/* Search Section */}
-          <div className="flex  items-center gap-4 sm:gap-6 mb-6">
+          <div className="flex  items-center gap-3 sm:gap-5 mb-6">
+            <div className="lg:hidden ">
+              <SidebarTrigger className="h-10 w-10 " />
+            </div>
             <div className="w-full sm:flex-1">
               <Input
                 type="text"
