@@ -38,8 +38,10 @@ const RootLayout = async ({ children }: { children: React.ReactNode }) => {
       <body className="font-sans">
         <AppProviders dehydratedState={dehydratedState}>
           <SidebarProvider>
-            <AppSidebar />
-            <main>{children}</main>
+            <div className="flex min-h-screen w-full">
+              <AppSidebar />
+              <main className="flex-1 w-full px-4 md:px-6">{children}</main>
+            </div>
           </SidebarProvider>
         </AppProviders>
       </body>

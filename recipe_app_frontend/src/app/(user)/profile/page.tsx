@@ -62,6 +62,16 @@ const UserProfile = () => {
         <div>
           <h1 className="text-xl font-semibold  mb-2">{user?.name}</h1>
           <p className="text-md mt-3">{user?.bio || "No bio yet"}</p>
+          <div>
+            <Button
+              className="rounded-sm"
+              onClick={() => {
+                router.push("/profile/edit");
+              }}
+            >
+              Edit Profile
+            </Button>
+          </div>
         </div>
       </div>
       {/* Stats */}
@@ -79,16 +89,6 @@ const UserProfile = () => {
         <div>
           <p className="text-xl font-bold">{userRecipes.length}</p>
           <span className="text-gray-900">Recipes</span>
-        </div>
-        <div>
-          <Button
-            className="rounded-sm"
-            onClick={() => {
-              router.push("/profile/edit");
-            }}
-          >
-            Edit Profile
-          </Button>
         </div>
       </div>
 
