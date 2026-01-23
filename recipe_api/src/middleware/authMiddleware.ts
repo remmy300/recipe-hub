@@ -30,7 +30,7 @@ export const protect = async (
     token = req.cookies.token;
   }
 
-  // FALLBACK: CHECK AUTH HEADER IF PROVIDED
+  // CHECK AUTH HEADER IF PROVIDED
   else if (
     req.headers.authorization &&
     req.headers.authorization.startsWith("Bearer ")

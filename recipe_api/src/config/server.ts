@@ -1,6 +1,7 @@
-import dotenv from "dotenv";
-dotenv.config();
 import mongoose from "mongoose";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 const MONGO_URI =
   process.env.MONGO_URI ||
@@ -8,19 +9,41 @@ const MONGO_URI =
   process.env.MONGO_URL ||
   process.env.DATABASE_URL;
 
-export const connectDB = async () => {
-  if (!MONGO_URI) {
-    console.error(
-      "Missing MongoDB connection string. Set one of: MONGO_URI, MONGODB_URI, MONGO_URL, DATABASE_URL"
-    );
-    process.exit(1);
+if (!MONGO_URI) {
+  throw new Error(
+    "Missing MongoDB connection string (MONGO_URI / MONGODB_URI / MONGO_URL / DATABASE_URL)",
+  );
+}
+
+// Global cache
+let cached = (global as any).mongoose;
+
+if (!cached) {
+  cached = (global as any).mongoose = {
+    conn: null,
+    promise: null,
+  };
+}
+
+export async function connectDB() {
+  if (cached.conn) {
+    return cached.conn;
   }
 
-  try {
-    await mongoose.connect(MONGO_URI);
-    console.log("MongoDB successfully connected!");
-  } catch (err: unknown) {
-    console.error("Database connection error:", err);
-    process.exit(1);
+  if (!cached.promise) {
+    const start = Date.now();
+
+    cached.promise = mongoose
+      .connect(MONGO_URI as string, {
+        bufferCommands: false,
+        serverSelectionTimeoutMS: 5000,
+      })
+      .then((mongoose) => {
+        console.log(`MongoDB connected (cached) in ${Date.now() - start}ms`);
+        return mongoose;
+      });
   }
-};
+
+  cached.conn = await cached.promise;
+  return cached.conn;
+}

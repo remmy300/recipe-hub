@@ -19,10 +19,13 @@ const safeParse = (value: any) => {
 export const getRecipes = async (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   try {
-    const recipes = await Recipe.find().sort({ createdAt: -1 }); //show newest  first
+    const start = Date.now();
+    const recipes = await Recipe.find().sort({ createdAt: -1 }); // show newest first
+    const dur = Date.now() - start;
+    console.log(`[timing] getRecipes query duration: ${dur}ms`);
     res.json(recipes);
   } catch (error) {
     console.log("Error fetching recipes data:", error);
@@ -35,7 +38,7 @@ export const getRecipes = async (
 export const getRecipe = async (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   try {
     const { id } = req.params;
@@ -43,7 +46,10 @@ export const getRecipe = async (
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return res.status(400).json({ message: "Invalid recipe ID" });
     }
+    const start = Date.now();
     const recipe = await Recipe.findById(req.params.id);
+    const dur = Date.now() - start;
+    console.log(`[timing] getRecipe (${id}) query duration: ${dur}ms`);
     res.json(recipe);
   } catch (error) {
     console.log("Error fetching a recipe data:", error);
@@ -56,13 +62,13 @@ export const getRecipe = async (
 export const updateRecipe = async (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   try {
     const updatedRecipe = await Recipe.findByIdAndUpdate(
       req.params.id,
       req.body,
-      { new: true }
+      { new: true },
     );
     res.json(updatedRecipe);
   } catch (error) {
@@ -76,7 +82,7 @@ export const updateRecipe = async (
 export const createRecipe = async (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   try {
     const { title, ingredients, description, instructions } = req.body;
@@ -110,13 +116,13 @@ export const createRecipe = async (
 export const fetchUserRecipes = async (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   try {
     const { id } = req.params;
     const recipes = await Recipe.find({ createdBy: id }).populate(
       "createdBy",
-      "name email avatar"
+      "name email avatar",
     );
     res.status(200).json(recipes);
   } catch (error) {
@@ -128,7 +134,7 @@ export const fetchUserRecipes = async (
 export const deleteRecipe = async (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   try {
     const deletedRecipe = await Recipe.findByIdAndDelete(req.params.id);
@@ -148,7 +154,7 @@ export const deleteRecipe = async (
 export const toggleLike = async (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   try {
     const userId = new Types.ObjectId(req.user._id);
@@ -178,7 +184,7 @@ export const toggleLike = async (
 export const toggleFavorite = async (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   try {
     const recipeId = req.params.id;
@@ -217,7 +223,7 @@ export const toggleFavorite = async (
 export const fetchFavourites = async (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   try {
     const userId = req.user._id;
